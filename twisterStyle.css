@@ -1,0 +1,27 @@
+#title {
+    opacity: 0.5;
+    transform:translateY(0.5em);
+    font-family: 'M PLUS Rounded 1c', sans-serif;
+    font-size:3.5em;
+    color:blue;
+}
+.nxtnxt {
+    color:gray;
+}
+.hero-body {
+    background-color: aliceblue
+}
+
+#tweet {
+    background-color: #1d9bf0;
+    color: #FFFFFF;
+}
+
+.nxt {
+    transition: all 0.5s ease;
+}
+
+.slide-fade {
+    opacity: 0;
+    transform: translateY(2em);
+  }
