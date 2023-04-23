@@ -72,10 +72,9 @@ function init() {
     let lis; let lis2;
 
     if (!isTwister) {
+        lis = getRandomAlphabets(keysCount);
+        lis2 = getRandomAlphabets(keysCount);
         for (let i = 0; i < keysCount; i++) {
-            lis = getRandomAlphabets(keysCount);
-            lis2 = getRandomAlphabets(keysCount);
-
             nxt[i].textContent = lis[i].toUpperCase();
             nxtnxt[i].textContent = lis2[i].toUpperCase();
         }
@@ -97,7 +96,11 @@ function init() {
             nxtnxt[i].textContent = lis[i].toUpperCase();
             nxtnxt[i].classList.add('is-danger');
         }
-        nxtnxt[rand].textContent = getRandomAlphabets(1)[0].toUpperCase();
+        for (let i = 0; i < 100; i++) {
+            nxtnxt[rand].textContent = getRandomAlphabets(1)[0].toUpperCase();
+            if (nxt[rand].textContent !== nxtnxt[rand].textContent) break;
+        }
+
         nxtnxt[rand].classList.remove('is-danger');
         nxtnxt[rand].classList.remove('is-warning');
         nxtnxt[rand].classList.add('is-warning');
@@ -218,10 +221,11 @@ function success() {
     //ワードを置き換える処理
     const nxt = document.querySelectorAll('.nxt');
     const nxtnxt = document.querySelectorAll('.nxtnxt');
+    let nextChars = getRandomAlphabets(keysCount);
     if (!isTwister) {
         for (let i = 0; i < keysCount; i++) {
             nxt[i].textContent = nxtnxt[i].textContent;
-            nxtnxt[i].textContent = getRandomAlphabets(1)[0].toUpperCase();
+            nxtnxt[i].textContent = nextChars[i].toUpperCase();
             //nxt[i].classList.add('slide-fade');
         }
     } else {
@@ -248,7 +252,10 @@ function success() {
                 nxt[i].classList.add('is-warning');
             }
         }
-        nxtnxt[randTmp].textContent = getRandomAlphabets(1)[0].toUpperCase();
+        for (let i = 0; i < 100; i++) {
+            nxtnxt[rand].textContent = getRandomAlphabets(1)[0].toUpperCase();
+            if (nxt[rand].textContent !== nxtnxt[rand].textContent) break;
+        }
         
     }
 
