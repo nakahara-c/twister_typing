@@ -78,6 +78,7 @@ function init() {
             nxt[i].textContent = lis[i].toUpperCase();
             nxtnxt[i].textContent = lis2[i].toUpperCase();
         }
+
     } else {
 
         let rand = Math.floor(Math.random() * keysCount);
@@ -98,7 +99,16 @@ function init() {
         }
         for (let i = 0; i < 100; i++) {
             nxtnxt[rand].textContent = getRandomAlphabets(1)[0].toUpperCase();
-            if (nxt[rand].textContent !== nxtnxt[rand].textContent) break;
+            if (nxt[rand].textContent !== nxtnxt[rand].textContent) {
+                //nxtnxtの中で重複がないかチェック
+                let flag = true;
+                for (let j = 0; j < keysCount; j++) {
+                    if (nxtnxt[rand].textContent === nxtnxt[j].textContent && rand !== j) {
+                        flag = false;
+                    }
+                }
+                if (flag === true) break;
+            }
         }
 
         nxtnxt[rand].classList.remove('is-danger');
@@ -114,8 +124,6 @@ function init() {
     timer.textContent = '0.0';
     progress.value = 0;
     progress.max = wordAllCount;
-
-
 
 }
 
@@ -232,7 +240,6 @@ function success() {
         
         let rand = Math.floor(Math.random() * keysCount);
         randTmp = rand;
-        console.log(randTmp);
 
         for (let i = 0; i < keysCount; i++) {
             nxt[i].textContent = nxtnxt[i].textContent;
@@ -254,7 +261,16 @@ function success() {
         }
         for (let i = 0; i < 100; i++) {
             nxtnxt[rand].textContent = getRandomAlphabets(1)[0].toUpperCase();
-            if (nxt[rand].textContent !== nxtnxt[rand].textContent) break;
+            if (nxt[rand].textContent !== nxtnxt[rand].textContent) {
+                //nxtnxtの中で重複がないかチェック
+                let flag = true;
+                for (let j = 0; j < keysCount; j++) {
+                    if (nxtnxt[rand].textContent === nxtnxt[j].textContent && rand !== j) {
+                        flag = false;
+                    }
+                }
+                if (flag === true) break;
+            }
         }
         
     }
@@ -268,8 +284,6 @@ function success() {
 function complete() {
     //タイマー止める処理
     stopInterval();
-
-    //console.log(keyPressed);
 
     //ツイートあれする処理
     makeTweet();
@@ -337,12 +351,19 @@ function whenKeydown(e) {
 
     //キーを押しっぱなしかのフラグ管理
     if (!keyPressed[e.key]) {
-        //console.log(`${e.key}が押されました`);
-
 
         keyPressed[e.key] = true;
 
-        //console.log(keyPressed);
+        const currentKeysButton = document.querySelectorAll('.keys');
+        //1個押しすぎたとき
+        if (countTrueValues(keyPressed) === keysCount + 1) {
+            for (let i = 0; i < keysCount; i++) {
+                currentKeysButton[i].classList.remove('is-primary');
+                currentKeysButton[i].classList.add('is-warning');
+            }
+        }
+
+        
 
         //画面更新の処理
         for (let i = 0; i < keysCount; i++) {
@@ -356,7 +377,7 @@ function whenKeydown(e) {
         //正解判定
         let isSuccess = true;
         for (let i = 0; i < keysCount; i++) {
-            if (pressedKeys[i].textContent === "-") isSuccess = false; 
+            if (pressedKeys[i].textContent !== nxt[i].textContent) isSuccess = false; 
         }
         if (countTrueValues(keyPressed) > keysCount) isSuccess = false;
 
@@ -379,6 +400,7 @@ function whenKeydown(e) {
     }
 }
 
+
 //キーを離したときの処理
 function whenKeyup(e) {
 
@@ -387,21 +409,29 @@ function whenKeyup(e) {
       }
     if (!isLowerCaseLetter(e.key)) return;
 
-    //console.log(`${e.key}が離されました`);
-
     let pressedKeys = document.querySelectorAll('.keys');
+    let nxt = document.querySelectorAll('.nxt');
     
     keyPressed[e.key] = false;
 
     let isSuccess = true;
     for (let i = 0; i < keysCount; i++) {
-        if (pressedKeys[i].textContent === "-") isSuccess = false; 
+        if (pressedKeys[i].textContent !== nxt[i].textContent) isSuccess = false; 
     }
     if (countTrueValues(keyPressed) > keysCount) isSuccess = false;
     if (isSuccessed) isSuccess = false;
-    isSuccessed = true;
+    isSuccessed = false;
     if (isSuccess) {
         success();
+    }
+
+    const currentKeysButton = document.querySelectorAll('.keys');
+    //1個押しすぎてて、ちょうどになったとき
+    if (countTrueValues(keyPressed) === keysCount) {
+        for (let i = 0; i < keysCount; i++) {
+            currentKeysButton[i].classList.remove('is-warning');
+            currentKeysButton[i].classList.add('is-primary');
+        }
     }
 
     function countTrueValues(obj) {
