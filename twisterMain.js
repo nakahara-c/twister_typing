@@ -6,7 +6,24 @@ isTwisterSelect.addEventListener('change', () => {
 isTwisterSelect.addEventListener('change', init);
 isTwisterSelect.addEventListener('change', main);
 
-let wordAllCount = 10;
+let isAlphabetOrNumber = 0;
+//0 -> alphabet // 1 -> number // 2 -> both
+
+const isAlphabetOrNumberSelect = document.getElementById('isAlphabetOrNumber');
+isAlphabetOrNumberSelect.addEventListener('change', () => {
+    if (isAlphabetOrNumberSelect.value === 'アルファベット') {
+        isAlphabetOrNumber = 0;
+    } else if (isAlphabetOrNumberSelect.value === '数字') {
+        isAlphabetOrNumber = 1;
+    } else {
+        isAlphabetOrNumber = 2;
+    }
+});
+isAlphabetOrNumberSelect.addEventListener('change', init);
+isAlphabetOrNumberSelect.addEventListener('change', main);
+
+
+let wordAllCount = 30;
 
 const wordCountSelect = document.getElementById('typeCount');
 wordCountSelect.addEventListener('change', () => {
@@ -33,7 +50,7 @@ progress.max = wordAllCount;
 
 //ページを開いてすぐの処理
 window.addEventListener('DOMContentLoaded', () => {
-    generateButtons(keysCount);
+    createButtons(keysCount);
     const nxt = document.querySelectorAll('.nxt');
     let lis = getRandomAlphabets(keysCount);
     for (let i = 0; i < keysCount; i++) {
@@ -66,7 +83,7 @@ function init() {
     }
     const keysSelect = document.getElementById('keysCount');
     keysCount = keysSelect.value;
-    generateButtons(keysCount);
+    createButtons(keysCount);
     const nxt = document.querySelectorAll('.nxt');
     const nxtnxt = document.querySelectorAll('.nxtnxt');
     let lis; let lis2;
@@ -128,7 +145,7 @@ function init() {
 }
 
 
-function generateButtons(cnt) {
+function createButtons(cnt) {
 
     const d = document.getElementById('next');
     const d2 = document.getElementById('nextnext');
@@ -288,16 +305,18 @@ function complete() {
     //ツイートあれする処理
     makeTweet();
 
-    window.alert(`${keysCount}キー同時押し cleared! in ${timer.textContent} seconds! \n Press Escape to restart!`)
+    window.alert(`${isAlphabetOrNumberSelect.value}:${keysCount}キー同時押し cleared! in ${timer.textContent} seconds! \n Press Escape to restart!`)
 
 
     keyPressed = new Object();
     init();
     main();
     let pressedKeys = document.querySelectorAll('.keys');
+    setTimeout(() => {
     for (let i = 0; i < wordAllCount; i++) {
         pressedKeys[i].textContent = '-';
     }
+    }, 0);
 
 }
 
@@ -341,10 +360,12 @@ function main() {
 
 function whenKeydown(e) {
 
-    function isLowerCaseLetter(char) {
-        return char >= 'a' && char <= 'z';
+    function isLowerCaseLetterOrNumber(char) {
+        //アルファベットもしくは数字かどうか判定
+        return char >= 'a' && char <= 'z' || char >= '0' && char <= '9';
+        //return char >= 'a' && char <= 'z';
       }
-    if (!isLowerCaseLetter(e.key)) return;
+    if (!isLowerCaseLetterOrNumber(e.key)) return;
 
     let pressedKeys = document.querySelectorAll('.keys');
     let nxt = document.querySelectorAll('.nxt');
@@ -405,7 +426,7 @@ function whenKeydown(e) {
 function whenKeyup(e) {
 
     function isLowerCaseLetter(char) {
-        return char >= 'a' && char <= 'z';
+        return char >= 'a' && char <= 'z' || char >= '0' && char <= '9';
       }
     if (!isLowerCaseLetter(e.key)) return;
 
@@ -462,7 +483,7 @@ function makeTweet() {
 
     const hashTags = "ツイスタータイピング";
     const mode = isTwister ? 'ツイスター' : 'ノーマル';
-    const tweetText = `${mode}モード${keysCount}個同時押し(${wordAllCount}回)を${time}秒でクリア！`;
+    const tweetText = `${mode}モード${isAlphabetOrNumberSelect.value}:${keysCount}個同時押し(${wordAllCount}回)を${time}秒でクリア！`;
 
     const url = 'https://nkhr.web.fc2.com/typing/twister.html';
     const tweetURL = `https://twitter.com/intent/tweet?ref_src=twsrc&text=${tweetText}&hashtags=${hashTags}&url=${url}`;
@@ -473,9 +494,16 @@ function makeTweet() {
 
 
 function getRandomAlphabets(n) {
-    const alphabets = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    //alphabetsをランダムに並べ替える
-    const shuffledAlphabets = alphabets.split('').sort(function(){return Math.random()-.5}).join('');
+    let characters = "";
+    if (isAlphabetOrNumber === 0) {
+    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    } else if (isAlphabetOrNumber === 1) {
+    characters = '0123456789';
+    } else {
+    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    }
+
+    const shuffledAlphabets = characters.split('').sort(function(){return Math.random()-.5}).join('');
     //配列にしたものをreturn
     return shuffledAlphabets.slice(0, n).split('');
 }
