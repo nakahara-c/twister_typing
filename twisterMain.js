@@ -1,3 +1,6 @@
+let startTime;
+let intervalId;
+
 let isTwister = false;
 const isTwisterSelect = document.getElementById('isTwister');
 isTwisterSelect.addEventListener('change', () => {
@@ -34,13 +37,10 @@ wordCountSelect.addEventListener('change', main);
 
 
 let randTmp = 100;
-let timerArray = new Array();
 
 let isSuccessed = false;
 
 let keyPressed = new Object();
-
-//window.addEventListener('click', stopInterval);
 
 const keysSelect = document.getElementById('keysCount');
 let keysCount = 3;
@@ -71,7 +71,7 @@ keysSelect.addEventListener('change', main);
 
 function init() {
 
-    stopInterval();
+    clearInterval(intervalId);
 
     const d = document.getElementById('next');
     const d2 = document.getElementById('nextnext');
@@ -201,10 +201,10 @@ function generateWord() {
     const nxtnxt = document.querySelectorAll('.nxtnxt');
 
     if (!isTwister) {
-    for (let i = 0; i < keysCount; i++) {
-        nxt[i].textContent = words[0][i].toUpperCase();
-        nxtnxt[i].textContent = words[0][i].toUpperCase();
-    }
+        for (let i = 0; i < keysCount; i++) {
+            nxt[i].textContent = words[0][i].toUpperCase();
+            nxtnxt[i].textContent = words[0][i].toUpperCase();
+        }
     } else {
         let rand = Math.floor(Math.random() * keysCount);
         randTmp = rand;
@@ -238,10 +238,11 @@ function judge(k) {
 
 function success() {
     if (progress.value === 0) {
-    timerArray.push(setInterval(startTimer, 100));
+        startTime = performance.now();
+        intervalId = setInterval(startTimer, 100);
     }
     progress.value += 1;
-    
+
 
     //ワードを置き換える処理
     const nxt = document.querySelectorAll('.nxt');
@@ -254,7 +255,7 @@ function success() {
             //nxt[i].classList.add('slide-fade');
         }
     } else {
-        
+
         let rand = Math.floor(Math.random() * keysCount);
         randTmp = rand;
 
@@ -289,7 +290,7 @@ function success() {
                 if (flag === true) break;
             }
         }
-        
+
     }
 
     if (progress.value === wordAllCount) {
@@ -300,7 +301,7 @@ function success() {
 
 function complete() {
     //タイマー止める処理
-    stopInterval();
+    clearInterval(intervalId);
 
     //ツイートあれする処理
     makeTweet();
@@ -313,9 +314,9 @@ function complete() {
     main();
     let pressedKeys = document.querySelectorAll('.keys');
     setTimeout(() => {
-    for (let i = 0; i < wordAllCount; i++) {
-        pressedKeys[i].textContent = '-';
-    }
+        for (let i = 0; i < wordAllCount; i++) {
+            pressedKeys[i].textContent = '-';
+        }
     }, 0);
 
 }
@@ -364,7 +365,7 @@ function whenKeydown(e) {
         //アルファベットもしくは数字かどうか判定
         return char >= 'a' && char <= 'z' || char >= '0' && char <= '9';
         //return char >= 'a' && char <= 'z';
-      }
+    }
     if (!isLowerCaseLetterOrNumber(e.key)) return;
 
     let pressedKeys = document.querySelectorAll('.keys');
@@ -384,7 +385,7 @@ function whenKeydown(e) {
             }
         }
 
-        
+
 
         //画面更新の処理
         for (let i = 0; i < keysCount; i++) {
@@ -398,7 +399,7 @@ function whenKeydown(e) {
         //正解判定
         let isSuccess = true;
         for (let i = 0; i < keysCount; i++) {
-            if (pressedKeys[i].textContent !== nxt[i].textContent) isSuccess = false; 
+            if (pressedKeys[i].textContent !== nxt[i].textContent) isSuccess = false;
         }
         if (countTrueValues(keyPressed) > keysCount) isSuccess = false;
 
@@ -410,12 +411,12 @@ function whenKeydown(e) {
         function countTrueValues(obj) {
             let count = 0;
             for (const key in obj) {
-              if (obj[key] === true) {
-                count++;
-              }
+                if (obj[key] === true) {
+                    count++;
+                }
             }
             return count;
-          }
+        }
 
 
     }
@@ -427,17 +428,17 @@ function whenKeyup(e) {
 
     function isLowerCaseLetter(char) {
         return char >= 'a' && char <= 'z' || char >= '0' && char <= '9';
-      }
+    }
     if (!isLowerCaseLetter(e.key)) return;
 
     let pressedKeys = document.querySelectorAll('.keys');
     let nxt = document.querySelectorAll('.nxt');
-    
+
     keyPressed[e.key] = false;
 
     let isSuccess = true;
     for (let i = 0; i < keysCount; i++) {
-        if (pressedKeys[i].textContent !== nxt[i].textContent) isSuccess = false; 
+        if (pressedKeys[i].textContent !== nxt[i].textContent) isSuccess = false;
     }
     if (countTrueValues(keyPressed) > keysCount) isSuccess = false;
     if (isSuccessed) isSuccess = false;
@@ -458,12 +459,12 @@ function whenKeyup(e) {
     function countTrueValues(obj) {
         let count = 0;
         for (const key in obj) {
-          if (obj[key] === true) {
-            count++;
-          }
+            if (obj[key] === true) {
+                count++;
+            }
         }
         return count;
-      }
+    }
 
     for (let i = 0; i < pressedKeys.length; i++) {
 
@@ -485,7 +486,7 @@ function makeTweet() {
     const mode = isTwister ? 'ツイスター' : 'ノーマル';
     const tweetText = `${mode}モード${isAlphabetOrNumberSelect.value}:${keysCount}個同時押し(${wordAllCount}回)を${time}秒でクリア！`;
 
-    const url = 'https://nkhr.web.fc2.com/typing/twister.html';
+    const url = 'https://nkhr-c.com/twistertyping/index.html';
     const tweetURL = `https://twitter.com/intent/tweet?ref_src=twsrc&text=${tweetText}&hashtags=${hashTags}&url=${url}`;
 
     tweetButton.href = tweetURL;
@@ -496,31 +497,33 @@ function makeTweet() {
 function getRandomAlphabets(n) {
     let characters = "";
     if (isAlphabetOrNumber === 0) {
-    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     } else if (isAlphabetOrNumber === 1) {
-    characters = '0123456789';
+        characters = '0123456789';
     } else {
-    characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     }
 
-    const shuffledAlphabets = characters.split('').sort(function(){return Math.random()-.5}).join('');
+    const shuffledAlphabets = characters.split('').sort(function () { return Math.random() - .5 }).join('');
     //配列にしたものをreturn
     return shuffledAlphabets.slice(0, n).split('');
 }
 
-
-
-
-function stopInterval() {
-    if (timerArray.length > 0) {
-        clearInterval(timerArray.shift());
+function stressFunc() {
+    let st = Date.now();
+    while (Date.now() - st < 300) {
     }
 }
+
+
+
 function startTimer() {
+
+    //stressFunc();
+
     const timer = document.getElementById('timer');
 
-    let nowTime = Number(timer.textContent);
-    nowTime = (nowTime + 0.1);
-    timer.textContent = nowTime.toFixed(1);
+    let elapsedTime = (performance.now() - startTime) / 1000;
+    timer.textContent = elapsedTime.toFixed(1);
 
 }
